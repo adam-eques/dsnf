@@ -1,7 +1,6 @@
 package main
 
 import (
-	"cloneprojects/postmates/database/models"
 	"log"
 	"os"
 
