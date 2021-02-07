@@ -1,12 +1,12 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/midepeter/train-ticket/database/models"
-	"github.com/midepeter/train-ticket/repository"
-	"gitub.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	"github.com/midepeter/train-ticket/utils/utils"
 )
 
 func (h *Handler) GetAllTickets(c *gin.Context) {
@@ -24,7 +24,7 @@ func (h *Handler) GetAllTickets(c *gin.Context) {
 	})
 }
 
-func (h *Handler)CreateTicket(c *gin.Context) {
+func (h *Handler) CreateTicket(c *gin.Context) {
 	var ticket []models.Ticket
 
 	if err := h.db.Create(&ticket).Error; err != nil {
@@ -36,56 +36,64 @@ func (h *Handler)CreateTicket(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "success",
-		"ticket": ticket,
+		"ticket":  ticket,
 	})
 }
 
-func (h *Handler)UpdateTicket(c *gin.Context) {
-	id := c.Params("id")
-
-	if id := ""{
+func (h *Handler) UpdateTicket(c *gin.Context) {
+	var ticket *models.Ticket
+	id := c.Query("id")
+	if id == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Ticket update failed",
 		})
 	}
-	ticket, err := h.Repo.Update(uint(id), data) 
+
+	id64 := utils.ConvertToUint64(id)
+	err := h.Repo.UpdateBooking(uint(id64), ticket)
 	if err != nil {
 		fmt.Println("Unable to update the ticket")
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "success",
-		"ticket": ticket,
+		"ticket":  ticket,
 	})
 }
 
-func (h *Handler)GetTicket(c *gin.Context) {
-	id := c.Params("id")
-	if id := "" {
+func (h *Handler) GetTicket(c *gin.Context) {
+	var ticket *models.Ticket
+
+	id := c.Query("id")
+	if id == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "failed to get ticket ",
 		})
 	}
 
-	ticket, err := h.Repo.Get(uint(id))
+	id64 := utils.ConvertToUint64(id)
+	err := h.Repo.GetBooking(uint(id64), ticket)
 	if err != nil {
 		fmt.Println("ticket not found")
 	}
 
-	c.JSON(http.StatuOK, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"message": "success",
-		"ticket": ticket,
+		"ticket":  ticket,
 	})
 }
 
-func (h *Handler)DeleteTicket(c *gin.Context) {
-	id := c.Params("id")
-	if id := "" {
+func (h *Handler) DeleteTicket(c *gin.Context) {
+	var ticket *models.Ticket
+	id := c.Query("id")
+	if id == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "failed",
 		})
 		return
 	}
-	_, err := h.Repo.Delete(uint(id), ) 
+
+	id64 := utils.ConvertToUint64(id)
+	err := h.Repo.DeleteBooking(uint(id64), ticket)
 	if err != nil {
 		panic(err)
 	}

@@ -1,26 +1,25 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/midepeter/train-ticket/database/models"
 )
 
-func (r *Repository) Get(id uint, data map[string]interface{}) (*models.Ticket, error) {
-	var ticket models.Ticket
-
-	r.db.Model(&ticket).Where("id = ?", id).First(data)
-	return &ticket, nil
+func (r *Repository) GetBooking(id uint, t *models.Ticket) (err error) {
+	if err = r.db.Where("id = ?", id).First(t).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
-func (r *Repository) Update(id uint, data map[string]interface{}) (*models.Ticket, error) {
-	var ticket models.Ticket
-
-	r.db.Model(&ticket).Where("id = ?", id).Update(data)
-	return &ticket, nil
+func (r *Repository) UpdateBooking(id uint, t *models.Ticket) (err error) {
+	fmt.Println(t)
+	r.db.Save(t)
+	return nil
 }
 
-func (r *Repository) Delete(id uint) error {
-	var ticket models.Ticket
-
-	r.db.Model(&ticket).Where("id= ?", id).Delete()
+func (r *Repository) DeleteBooking(id uint, t *models.Ticket) error {
+	r.db.Where("id= ?", id).Delete(t)
 	return nil
 }
