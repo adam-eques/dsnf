@@ -10,9 +10,9 @@ import (
 
 type Config struct {
 	Host     string
+	Port     string
 	Password string
 	User     string
-	Port     string
 	DBName   string
 	SSLMode  string
 	DBUrl    string
@@ -23,7 +23,7 @@ func SetupDatabase(db *gorm.DB, models ...interface{}) error {
 	return err
 }
 
-func New(config Config) (*gorm.DB, error) {
+func New(config *Config) (*gorm.DB, error) {
 	var (
 		db  *gorm.DB
 		err error

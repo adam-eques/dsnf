@@ -2,20 +2,19 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/midepeter/train-ticker/handler"
+	"github.com/midepeter/train-ticket/handler"
 )
 
 func StartServer() *gin.Engine {
+	h := handler.Handler{}
+
 	r := gin.Default()
 
-	v1 := r.Group("v1")
-	{
-		v1.GET("/bookings", handler.GetAllTicket)
-		v1.POST("/tickets", handler.CreateTicket)
-		v1.PUT("/tickets/:id", handler.UpdateTicket)
-		v1.GET("/tickets/:id", handler.GetTicket)
-		v1.DELETE("/tickets/:id", handler.DeleteTicket)
-	}
+	r.GET("/bookings", h.GetAllTickets)
+	r.POST("/tickets", h.CreateTicket)
+	r.PUT("/tickets/:id", h.UpdateTicket)
+	r.GET("/tickets/:id", h.GetTicket)
+	r.DELETE("/tickets/:id", h.DeleteTicket)
 
 	return r
 }

@@ -9,5 +9,5 @@ type Repository struct {
 }
 
 func Repo(db *gorm.DB) *Repository {
-	return &Repository{db}
+	return &Repository{db: db}
 }

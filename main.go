@@ -21,13 +21,12 @@ func main() {
 	}
 
 	db, err := postgres.New(&postgres.Config{
-		User:     os.Getenv("DB_USER"),
-		Password: os.Getenv("DB_PASS"),
-		DBName:   os.Getenv("DB_NAME"),
-		SSLMode:  os.Getenv("DB_SSLMODE"),
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),
-		DBUrl:    os.Getenv("DB_URL"),
+		Password: os.Getenv("DB_PASS"),
+		User:     os.Getenv("DB_USER"),
+		DBName:   os.Getenv("DB_NAME"),
+		SSLMode:  os.Getenv("DB_SSLMODE"),
 	})
 
 	if err != nil {
@@ -36,9 +35,6 @@ func main() {
 
 	err = postgres.SetupDatabase(db,
 		&models.Ticket{},
-		&models.Station{},
-		&models.Location{},
-		&models.User{},
 	)
 
 	if err != nil {
@@ -47,5 +43,5 @@ func main() {
 
 	r := server.StartServer()
 
-	r.RUN(":8000")
+	r.Run(":8000")
 }

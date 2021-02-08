@@ -25,7 +25,7 @@ func (h *Handler) GetAllTickets(c *gin.Context) {
 }
 
 func (h *Handler) CreateTicket(c *gin.Context) {
-	var ticket []models.Ticket
+	var ticket models.Ticket
 
 	if err := h.db.Create(&ticket).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
