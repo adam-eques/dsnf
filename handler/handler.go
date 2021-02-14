@@ -9,3 +9,7 @@ type Handler struct {
 	db   *gorm.DB
 	Repo *repository.Repository
 }
+
+func NewHandler(db *gorm.DB) *Handler {
+	return &Handler{db: db}
+}

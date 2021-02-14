@@ -6,7 +6,7 @@ import (
 )
 
 func StartServer() *gin.Engine {
-	h := handler.Handler{}
+	h := handler.NewHandler(db)
 
 	r := gin.Default()
 
