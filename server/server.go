@@ -6,11 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
-<<<<<<< HEAD
-func StartServer() *gin.Engine {
-=======
 func StartServer(db *gorm.DB) *gin.Engine {
->>>>>>> c3d406c1586667a68bca168dd8d85b5bc4e01b07
+
 	h := handler.NewHandler(db)
 
 	r := gin.Default()
