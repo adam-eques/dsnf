@@ -11,5 +11,11 @@ type Handler struct {
 }
 
 func NewHandler(db *gorm.DB) *Handler {
+<<<<<<< HEAD
 	return &Handler{db: db}
 }
+=======
+	repo := repository.Repo(db)
+	return &Handler{db: db, Repo: repo}
+}
+>>>>>>> c3d406c1586667a68bca168dd8d85b5bc4e01b07
