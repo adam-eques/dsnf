@@ -8,9 +8,9 @@ dnsf is DNS forwarder which help foward queries queries from internal DNS server
 - It also reduces traffic on external internet DNS servers.
 
 ## How to run
-clone the repository - git clone https://github.com/acentior/dnsf
-go install you can have the dnsf command installed directly to you $GOPATH/bin folder
-run dnsf to confirm if installed properly
+-- git clone the repository - git clone https://github.com/acentior/dnsf
+-- go install you can have the dnsf command installed directly to you $GOPATH/bin folder
+-- run dnsf to confirm if installed properly
 
 ## Commands and Flags
 Here are some of the custom commands and flag that you can use when trying to model you dns query

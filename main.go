@@ -1,71 +1,41 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 
 	"github.com/miekg/dns"
 )
 
-var records = map[string]string{
-	"test.service.": "192.169.0.2",
-}
+var (
+	help    string
+	version string
+	port    string
+)
 
 func main() {
+	flag.StringVar(&help, "help", "", "This describes the command and flags of dnsf")
+	flag.StringVar(&version, "version", "", "The version of the program")
+	flag.StringVar(&port, "port", "5053", "The port where the dns server will be served")
+
+	flag.Parse()
 	dns.HandleFunc("service.", handleDNSClient)
 
 	srv := &dns.Server{
-		Addr: ":5053",
+		Addr: fmt.Sprintf(":%s", port),
 		Net:  "udp",
 	}
 
-	log.Println("Serving")
+	done := make(chan struct } , 1)
+	log.Println("Currently running the DNS server")
 	go func() {
 		err := srv.ListenAndServe()
 		if err != nil {
 			panic(err)
 		}
+		done <- true
 	}()
-}
 
-func handleDNSClient(w dns.ResponseWriter, r *dns.Msg) {
-	log.Println("One request here")
-	n := new(dns.Msg)
-
-	n.SetReply(r)
-	n.Compress = false
-
-	switch r.Opcode {
-	case dns.OpcodeQuery:
-		parseQuery(n)
-	case dns.OpcodeStatus:
-		log.Println("opcode return server status")
-		sendStatus()
-	}
-
-	w.WriteMsg(n)
-}
-
-func parseQuery(m *dns.Msg) {
-	if m == nil {
-		return
-	}
-
-	for _, v := range m.Question {
-		switch v.Qtype {
-		case dns.TypeA:
-			log.Println("Query for ", v.Name)
-			ip, ok := records[v.Name]
-			if !ok || ip == "" {
-				rr, err := dns.NewRR(fmt.Sprintf("%s A %s", v.Name, ip))
-				if err != nil {
-					m.Answer = append(m.Answer, rr)
-				}
-			}
-		}
-	}
-}
-
-func sendStatus() {
-	fmt.Println("ping pong!")
+	<-done
 }
