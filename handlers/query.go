@@ -1,17 +1,26 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
+	"sync"
 
 	"github.com/miekg/dns"
+
+	"github.com/acentior/dnsf/cache"
 )
 
-var records = map[string]string{
+var ecords = map[string]string{
 	"test.service.": "192.169.0.2",
 }
 
-func handleDNSClient(w dns.ResponseWriter, r *dns.Msg) {
-	log.Println("One request here")
+type QueryHandler struct {
+	lock  sync.Mutex
+	Cache *cache.Cache
+}
+
+func (h *QueryHandler) HandleDNSClient(w dns.ResponseWriter, r *dns.Msg) {
+	log.Printf("%d request here", r.Id)
 	n := new(dns.Msg)
 
 	n.SetReply(r)
@@ -19,16 +28,13 @@ func handleDNSClient(w dns.ResponseWriter, r *dns.Msg) {
 
 	switch r.Opcode {
 	case dns.OpcodeQuery:
-		parseQuery(n)
-	case dns.OpcodeStatus:
-		log.Println("opcode return server status")
-		sendStatus()
+		h.parseQuery(n)
 	}
 
 	w.WriteMsg(n)
 }
 
-func parseQuery(m *dns.Msg) {
+func (h *QueryHandler) parseQuery(m *dns.Msg) {
 	if m == nil {
 		return
 	}
@@ -37,8 +43,8 @@ func parseQuery(m *dns.Msg) {
 		switch v.Qtype {
 		case dns.TypeA:
 			log.Println("Query for ", v.Name)
-			ip, ok := records[v.Name]
-			if !ok || ip == "" {
+			ip, err := h.Cache.Get(v.Name)
+			if err == nil {
 				rr, err := dns.NewRR(fmt.Sprintf("%s A %s", v.Name, ip))
 				if err != nil {
 					m.Answer = append(m.Answer, rr)
@@ -46,13 +52,15 @@ func parseQuery(m *dns.Msg) {
 			}
 		case dns.TypeAAAA:
 			log.Println("Query for and IPv6 address ", v.Name)
-			ip, ok := records[v.Name]
-			if !ok || ip == "" {
-				rr, err := dns.NewRR(fmt.Sprinf("%s A %", v.Name, ip))
+			ip, err := h.Cache.Get(v.Name)
+			if err == nil {
+				rr, err := dns.NewRR(fmt.Sprintf("%s A %", v.Name, ip))
 				if err != nil {
 					m.Answer = append(m.Answer, rr)
 				}
 			}
+		default:
+			log.Println("Requested query not found")
 		}
 	}
 }
